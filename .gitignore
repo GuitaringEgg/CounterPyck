@@ -38,3 +38,5 @@ nosetests.xml
 # My defines
 images/
 machups.json
+*.png
+*.dmp
