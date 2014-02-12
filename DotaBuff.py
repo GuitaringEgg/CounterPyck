@@ -34,14 +34,14 @@ class DotaBuff():
 
         self.matchups = {matchup[0]: matchup[1] for matchup in matchups_list}
         print 'Processing %s matchups...' % len(self.matchup_links)
-        with open("matchups.json", "w") as outfile:
+        with open("data/matchups.json", "w") as outfile:
             json.dump(self.matchups, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
     def get_hero_data(self):
-        if os.path.exists("matchups.json"):
-            self.matchups = json.load(open("matchups.json", "r"))
+        if os.path.exists("data/matchups.json"):
+            self.matchups = json.load(open("data/matchups.json", "r"))
         else:
-            get_hero_data_dotabuff()
+            self.get_hero_data_dotabuff()
 
     def get_matchup_percentage(self, hero, heroes):
         perc = 0.0
@@ -70,9 +70,9 @@ class DotaBuff():
         return (hero_name, matchups)
 
     def get_hero_images(self):
-        if not os.path.exists("images"):
-            os.makedirs("images")
-        os.chdir("images")
+        if not os.path.exists("data/images"):
+            os.makedirs("data/images")
+        os.chdir("data/images")
 
         for hero in api.get_heroes()["result"]["heroes"]:
             if hero["name"].find("abyssal_underlord") != -1:

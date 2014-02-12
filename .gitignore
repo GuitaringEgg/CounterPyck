@@ -36,7 +36,7 @@ nosetests.xml
 .pydevproject
 
 # My defines
-images/
+data/
 machups.json
 *.png
 *.dmp

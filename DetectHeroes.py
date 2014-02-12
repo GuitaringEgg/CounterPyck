@@ -29,7 +29,7 @@ def grab_screenshot():
     win32gui.SetForegroundWindow(hwnd)
     bbox = win32gui.GetWindowRect(hwnd)
     img = ImageGrab.grab(bbox)
-    img.save("ss.png")
+    img.save("data/ss.png")
 
     return True
 
@@ -89,24 +89,24 @@ db = DotaBuff()
 db.get_hero_data()
 
 # generate the points for every hero
-for image in os.listdir("images/"):
-    heroes.append(get_key_points(os.path.join("images/", image)))
+for image in os.listdir("data/images/"):
+    heroes.append(get_key_points(os.path.join("data/images/", image)))
 
 start_time = time.time()
 pos = [{},{}]
 
-while time.time() - start_time < 1:
+while time.time() - start_time < 60:
     last_time = time.time()
-    #result = grab_screenshot()
-    #if result == False:
-    #    print "Error: Couldn't find dota screen"
-    #    break
+    result = grab_screenshot()
+    if result == False:
+        print "Error: Couldn't find dota screen"
+        break
 
-    screen_points = get_key_points("ss.png", store_keypoints=True)
+    screen_points = get_key_points("data/ss.png", store_keypoints=True)
 
     knn = train_knn(screen_points)
 
-    img = cv2.imread("ss.png")
+    img = cv2.imread("data/ss.png")
 
     for hero in heroes:
         hero.total = 0
@@ -117,10 +117,8 @@ while time.time() - start_time < 1:
             for i, descriptor in enumerate(hero.rows):
 
                 descriptor = numpy.array(descriptor, dtype = numpy.float32).reshape((1, hero.rowsize))
-                #print i, descriptor.shape, samples[0].shape
                 retval, results, neigh_resp, dists = knn.find_nearest(descriptor, 1)
                 res, dist =  int(results[0][0]), dists[0][0]
-                #print res, dist
 
                 if dist < 0.1:
                     hero.matches += 1
@@ -139,10 +137,8 @@ while time.time() - start_time < 1:
             for i, descriptor in enumerate(hero.rows):
 
                 descriptor = numpy.array(descriptor, dtype = numpy.float32).reshape((1, hero.rowsize))
-                #print i, descriptor.shape, samples[0].shape
                 retval, results, neigh_resp, dists = knn.find_nearest(descriptor, 1)
                 res, dist =  int(results[0][0]), dists[0][0]
-                #print res, dist
 
                 if dist < 0.1:
                     hero.matches += 1
@@ -176,16 +172,19 @@ while time.time() - start_time < 1:
             cv2.circle(img,center,5,(0, 0, 225),-1)
             #print "{} is on screen at ({}, {}) in slot {}".format(hero.name, x, y, slot)
             if int(slot) < 5:
-                pos[0][slot] = hero.name[7:-4]
+                pos[0][slot] = hero.name[len("data/images/"):-4]
             else:
-                pos[1][slot] = hero.name[7:-4]
+                pos[1][slot] = hero.name[len("data/images/"):-4]
 
-    data = db.get_hero_matchup(pos[0])
-    keys = sorted(data, key=operator.itemgetter(1), reverse=True)
-    for key in keys:
-        print key, data[key]
+    data = db.get_hero_matchup(pos[1])
+    print pos
+    #keys = sorted(data, key=operator.itemgetter(1), reverse=True)
+    highest = -999
+    high_key = ""
+    for key in data:
+        if data[key] > highest:
+            highest = data[key]
+            high_key = key
+    print "{} has a {} advantage".format(high_key, highest)
 
-    cv2.imshow("Detected", img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
     print "Time elapsed {}s".format(time.time() - last_time)
