@@ -2,10 +2,10 @@ import sys
 from PyQt4 import QtGui, QtCore
 
 
-class Example(QtGui.QWidget):
+class CounterPyckGui(QtGui.QWidget):
 
     def __init__(self):
-        super(Example, self).__init__()
+        super(CounterPyckGui, self).__init__()
 
         self.initUI()
 
@@ -23,7 +23,7 @@ class Example(QtGui.QWidget):
 def main():
 
     app = QtGui.QApplication(sys.argv)
-    ex = Example()
+    ex = CounterPyckGui()
     sys.exit(app.exec_())
 
 
