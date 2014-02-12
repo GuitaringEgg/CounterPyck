@@ -6,7 +6,7 @@ Counter pick is a work-in-progress program that shows viable counter picks again
 TODO
 --------
 - ~~Tidy repo~~
-- Tidy code into nicer, logical classes and files
+- ~~Tidy code into nicer, logical classes and files~~
 - Make image analyser run in a seperate thread
 - Get hero counter picks working based on matchup data
 - Get it working in the console first
@@ -16,6 +16,7 @@ TODO
 
 Future
 ---------
+- Add a manual and automatic mode. Manual mode will look at snapshots folder and have a key bound in game to take a snapshot
 - Detect when picking starts and finishes to only analyse when heroes can actually be there
 - Auto detect game mode
 - Detect our selected hero
