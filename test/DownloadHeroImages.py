@@ -2,9 +2,9 @@ import os, urllib2, cStringIO
 from dota2py import api
 import Image
 
-if not os.path.exists("../images"):
-    os.makedirs("../images")
-os.chdir("../images")
+if not os.path.exists("../data/images"):
+    os.makedirs("../data/images")
+os.chdir("../data/images")
 
 scale = 50/1080.0
 

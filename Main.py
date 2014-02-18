@@ -1,7 +1,7 @@
-#from CounterPyck import CounterPyck
+from CounterPyck import CounterPyck
 
-#cp = CounterPyck()
+cp = CounterPyck()
 
-#cp.run()
+cp.run()
 
 

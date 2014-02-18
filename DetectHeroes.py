@@ -91,8 +91,6 @@ db.get_hero_data()
 # generate the points for every hero
 for image in os.listdir("data/images/"):
     heroes.append(get_key_points(os.path.join("data/images/", image)))
-print "lol"
-print heroes
 #log.info("Found {} heros".format(len(heroes)))
 
 start_time = time.time()
@@ -103,7 +101,7 @@ while time.time() - start_time < 60:
     #result = grab_screenshot()
     result = True
     if result == False:
-        print "Error: Couldn't find dota screen"
+        print("Error: Couldn't find dota screen")
         break
 
     screen_points = get_key_points("data/ss.png", store_keypoints=True)

@@ -15,15 +15,17 @@ class ImageMatcher():
         self.detector = cv2.SURF(hessian_threshold)
         self.templates = []
 
-    def get_key_points(self, file_name, store_keypoints=False):
+    def get_key_points(self, file_name, subrect=None, store_keypoints=False):
         points = key_points()
         points.name = file_name
         points.matched = 0
         points.total = 0
 
         template = cv2.imread(file_name)
-        (keypoints, descriptors) = self.detector.detectAndCompute(template, None,
-                                                               useProvidedKeypoints = False)
+        if subrect is not None:
+            template = template[subrect[1]:subrect[3], subrect[0]:subrect[2]]
+        cv2.imwrite("test.png", template)
+        (keypoints, descriptors) = self.detector.detectAndCompute(template, None, useProvidedKeypoints = False)
 
         if store_keypoints:
             points.keypoints = keypoints
@@ -69,17 +71,17 @@ class ImageMatcher():
             self.templates.append(self.get_key_points(name))
 
     def find_slot_for_hero(self, point):
-        slots = {"0":[[164, 84], [255, 136]],
-                 "1":[[271, 84], [362, 136]],
-                 "2":[[375, 84], [467, 136]],
-                 "3":[[482, 84], [575, 136]],
-                 "4":[[589, 84], [681, 136]],
+        slots = {"0":[[0, 0], [91, 52]],
+                 "1":[[107, 0], [198, 52]],
+                 "2":[[211, 0], [303, 52]],
+                 "3":[[318, 0], [411, 52]],
+                 "4":[[425, 0], [517, 52]],
 
-                 "5":[[1215, 84], [1307, 136]],
-                 "6":[[1322, 84], [1414, 136]],
-                 "7":[[1427, 84], [1520, 136]],
-                 "8":[[1534, 84], [1627, 136]],
-                 "9":[[1641, 84], [1733, 136]]}
+                 "5":[[1051, 0], [1143, 52]],
+                 "6":[[1158, 0], [1250, 52]],
+                 "7":[[1263, 0], [1356, 52]],
+                 "8":[[1370, 0], [1463, 52]],
+                 "9":[[1477, 0], [1569, 52]]}
 
         for key, rect in slots.iteritems():
             if point[0] > rect[0][0] and point[0] < rect[1][0] and\
@@ -88,13 +90,13 @@ class ImageMatcher():
         return False
 
     def analyse_for_templates(self):
-        screen_points = self.get_key_points("data/ss.png", store_keypoints=True)
+        screen_points = self.get_key_points("data/ss.png", subrect=[164, 84, 1733, 136], store_keypoints=True)
 
         knn = self.train_knn(screen_points)
 
         img = cv2.imread("data/ss.png")
 
-        output_data = [{}, {}]
+        output_data = {"radient":{}, "dire":{}}
 
         for template in self.templates:
             template.total = 0
@@ -140,7 +142,6 @@ class ImageMatcher():
                 x = sum(v[0] for v in matchingpoints) / float(len(matchingpoints))
                 y = sum(v[1] for v in matchingpoints) / float(len(matchingpoints))
                 center = (int(x), int(y))
-
                 slot = self.find_slot_for_hero(center)
                 if slot == False:
                     temp, classified_points, means = cv2.kmeans(data=numpy.asarray(matchingpoints, dtype="float32"), K=2, bestLabels=None,
@@ -160,8 +161,8 @@ class ImageMatcher():
                 cv2.circle(img,center,5,(0, 0, 225),-1)
                 #print "{} is on screen at ({}, {}) in slot {}".format(template.name, x, y, slot)
                 if int(slot) < 5:
-                    output_data[0][slot] = template.name[len("data/images/"):-4]
+                    output_data["radient"][slot] = template.name[len("data/images/"):-4]
                 else:
-                    output_data[1][slot] = template.name[len("data/images/"):-4]
+                    output_data["dire"][slot] = template.name[len("data/images/"):-4]
 
         return output_data

@@ -81,8 +81,8 @@ class DotaBuff():
     # get the matchup percentage between a hero and a list of other heroes
     def get_matchup_percentage(self, hero, heroes):
         perc = 0.0
-        print heroes
         for slot in heroes:
+            #print self.matchups["data"]
             perc += float(self.matchups["data"][hero][heroes[slot]])
 
         return perc
@@ -90,7 +90,7 @@ class DotaBuff():
     # get the matchup percentage data for every hero verse a list of other heroes
     def get_hero_matchup(self, heroes):
         data = {}
-        for hero in self.matchups:
+        for hero in self.matchups["data"]:
             if not hero in heroes.values():
                 data[hero] = self.get_matchup_percentage(hero, heroes)
         return data

@@ -4,6 +4,7 @@ import logging as log
 import time
 import os
 import wx
+import operator
 
 DEBUG = True
 
@@ -29,27 +30,24 @@ class CounterPyck():
     def run(self):
         start_time = time.time()
 
-        while time.time() - start_time < 60:
-            last_time = time.time()
+        #while time.time() - start_time < 60:
+        last_time = time.time()
 
-            result = True if DEBUG else self.grab_screenshot()
-            if result == False:
-                print "Error: Couldn't find dota screen"
-                break
+        result = True if DEBUG else self.grab_screenshot()
+        if result == False:
+            print "Error: Couldn't find dota screen"
+            return
 
-            self.results = self.image_matcher.analyse_for_templates()
+        self.results = self.image_matcher.analyse_for_templates()
 
-            data = self.dota_buff.get_hero_matchup(self.results[0])
-            #keys = sorted(data, key=operator.itemgetter(1), reverse=True)
-            highest = -999
-            high_key = ""
-            for key in data:
-                if data[key] > highest:
-                    highest = data[key]
-                    high_key = key
-            print "{} has a {} advantage".format(high_key, highest)
+        print self.results
 
-            print "Time elapsed {}s".format(time.time() - last_time)
+        data = self.dota_buff.get_hero_matchup(self.results["radient"])
+        sorted_dota = sorted(data.iteritems(), key=operator.itemgetter(1), reverse=True)
+
+        print "{} has a {} advantage".format(sorted_dota[0][0], sorted_dota[0][1])
+
+        print "Time elapsed {}s".format(time.time() - last_time)
 
 
     def grab_screenshot(self):
@@ -76,6 +74,7 @@ class CounterPyck():
         return True
 
     def grab_screenshot_wx(self):
+        app = wx.App()  # Need to create an App instance before doing anything
 
         screen = wx.ScreenDC()
         size = screen.GetSize()
@@ -86,9 +85,3 @@ class CounterPyck():
         del mem  # Release bitmap
         bmp.SaveFile('screenshot.png', wx.BITMAP_TYPE_PNG)
 
-
-app = wx.App()  # Need to create an App instance before doing anything
-cp = CounterPyck()
-cp.grab_screenshot_wx()
-cp.grab_screenshot_wx()
-cp.grab_screenshot_wx()

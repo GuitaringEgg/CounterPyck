@@ -40,3 +40,6 @@ data
 machups.json
 *.png
 *.dmp
+*.suo
+CounterPyck.pyproj
+CounterPyck.sln
