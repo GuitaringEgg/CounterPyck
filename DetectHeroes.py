@@ -1,3 +1,8 @@
+"""
+The first file that showed that it could work the way I wish it too.
+Is only kept for reference, and is not part of the project 19/02/14
+"""
+
 import cv2
 import cv2.cv as cv
 import numpy

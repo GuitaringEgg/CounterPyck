@@ -1,21 +1,40 @@
-import cv2
-import cv2.cv as cv
-import numpy
 import os
 import time
 import operator
 
+import cv2
+import cv2.cv as cv
+import numpy
+
 class key_points():
+    """
+    A fake struct for the keypoint information
+    """
     pass
 
+
 class ImageMatcher():
+    """
+    The image processing class that processes images against a number of
+    templates and returns which are found.
+    Extended to support detecing what slot each hero is in for easy team parsing
+    """
 
     def __init__(self):
+        """
+        Setup the detector
+        """
         hessian_threshold = 85
         self.detector = cv2.SURF(hessian_threshold)
         self.templates = []
 
     def get_key_points(self, file_name, subrect=None, store_keypoints=False):
+        """
+        Get all key points of an image from a file.
+        Subrect will only examine a rect of the image
+        Store keypoints will store the keypoint information, which is sometimes needed
+        """
+
         points = key_points()
         points.name = file_name
         points.matched = 0
@@ -39,38 +58,30 @@ class ImageMatcher():
         return points
 
     def train_knn(self, points):
+        """
+        Train the knN with data from some points.
+        """
+
         # kNN training - learn mapping from hrow to hkeypoints index
         samples = points.rows
         responses = numpy.arange(len(points.keypoints), dtype = numpy.float32)
-        #print len(samples), len(responses)
         knn = cv2.KNearest()
         knn.train(samples,responses)
         return knn
 
-    def find_slot_for_hero(self, point):
-        slots = {"0":[[164, 84], [255, 136]],
-                 "1":[[271, 84], [362, 136]],
-                 "2":[[375, 84], [467, 136]],
-                 "3":[[482, 84], [575, 136]],
-                 "4":[[589, 84], [681, 136]],
-
-                 "5":[[1215, 84], [1307, 136]],
-                 "6":[[1322, 84], [1414, 136]],
-                 "7":[[1427, 84], [1520, 136]],
-                 "8":[[1534, 84], [1627, 136]],
-                 "9":[[1641, 84], [1733, 136]]}
-
-        for key, rect in slots.iteritems():
-            if point[0] > rect[0][0] and point[0] < rect[1][0] and\
-                point[1] > rect[0][1] and point[1] < rect[1][1]:
-                return key
-        return False
-
     def set_templates(self, file_list):
+        """
+        Set the templates to look from a list of files
+        """
+
         for name in file_list:
             self.templates.append(self.get_key_points(name))
 
     def find_slot_for_hero(self, point):
+        """
+        Find which slot the hero is in. Return -1 if no slot was found
+        """
+
         slots = {"0":[[0, 0], [91, 52]],
                  "1":[[107, 0], [198, 52]],
                  "2":[[211, 0], [303, 52]],
@@ -90,13 +101,17 @@ class ImageMatcher():
         return False
 
     def analyse_for_templates(self):
+        """
+        Analyse the screen of templates and return some nice data
+        """
+
         screen_points = self.get_key_points("data/ss.png", subrect=[164, 84, 1733, 136], store_keypoints=True)
 
         knn = self.train_knn(screen_points)
 
         img = cv2.imread("data/ss.png")
 
-        output_data = {"radient":{}, "dire":{}}
+        output_data = {"radiant":{}, "dire":{}}
 
         for template in self.templates:
             template.total = 0
@@ -161,7 +176,7 @@ class ImageMatcher():
                 cv2.circle(img,center,5,(0, 0, 225),-1)
                 #print "{} is on screen at ({}, {}) in slot {}".format(template.name, x, y, slot)
                 if int(slot) < 5:
-                    output_data["radient"][slot] = template.name[len("data/images/"):-4]
+                    output_data["radiant"][slot] = template.name[len("data/images/"):-4]
                 else:
                     output_data["dire"][slot] = template.name[len("data/images/"):-4]
 
