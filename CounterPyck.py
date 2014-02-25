@@ -78,6 +78,7 @@ class CounterPyck():
         dota = [(hwnd, title) for hwnd, title in winlist if 'dota 2' in title.lower()]
         if len(dota) == 0:
             return False
+
         # just grab the hwnd for first window matching dota
         dota = dota[0]
         hwnd = dota[0]

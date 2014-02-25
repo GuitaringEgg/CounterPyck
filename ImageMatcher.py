@@ -6,6 +6,7 @@ import cv2
 import cv2.cv as cv
 import numpy
 
+
 class key_points():
     """
     A fake struct for the keypoint information
