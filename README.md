@@ -8,11 +8,13 @@ TODO
 - ~~Tidy repo~~
 - ~~Tidy code into nicer, logical classes and files~~
 - Make image analyser run in a seperate thread
-- Get hero counter picks working based on matchup data
-- Get it working in the console first
+- ~Get hero counter picks working based on matchup data~
+- ~Get it working in the console first~
 - Create the gui
 - Fixed limitations
 - Move all data to appdata? Probably
+- Use a better method of getting a screenshot
+	- Maybe using dota's screenshot function in game? (Still needs to be in focus)
 
 Future
 ---------
@@ -21,7 +23,7 @@ Future
 - Auto detect game mode
 - Detect our selected hero
 - Optimise
-    - Image resizing may speed up detection, but make it less accurate
+    - ~Image resizing may speed up detection, but make it less accurate~
 - Detect different game modes
 - All pick support should be already there
 - **Random draft**
@@ -34,7 +36,6 @@ Future
 Known limitations
 --------------
 - Won't support resolutions other than 1920x1080. Should be easy to alter
-- The code is a mess. The repo is a mess. Needs tidied before continuing
 - Needs to be focused on the dota window atm, which isn't ideal. screenshoting the entire screen maybe take too long to analyse. Resize?
 - Preliminary matchup analysis is odd. Many negative advantages. Need to consider the data more.
 - Will only work on dual screen monitors. Need to find a way to write text on top of other windows to get around that.
