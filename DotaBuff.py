@@ -13,6 +13,7 @@ from dota2py import api
 import Image
 
 
+
 class DotaBuff():
     """
     A class encapsulation the hero matchup data methods,
@@ -32,7 +33,7 @@ class DotaBuff():
         https://gist.github.com/mplewis/8213062
         """
 
-        log.warning("Downloading matchup data. This normally takes a minute..")
+        log.warning("Downloading matchup data. This normally takes a minute...")
         matchup_links = {}
 
         # grab all the heroes names and generate all the links we need
@@ -71,7 +72,7 @@ class DotaBuff():
         # make some soup from the html
         soup = BeautifulSoup(html)
         # find the hero name
-        hero_name = soup.find('title').text.split(' - ')[2]
+        hero_name = soup.find('title').text.split(' - ')[0]
         log.info("Getting matchup data for {}".format(hero_name))
 
         # find all the rows and get all the heroes and corresponding matchup data
@@ -95,6 +96,7 @@ class DotaBuff():
             time_since_last_update = time.time() - self.matchups["time"]
             if time_since_last_update > 3600*24*7:
                 log.warning("It's been over a week since the data was last updated.")
+                self.get_hero_data_dotabuff()
         else:
             self.get_hero_data_dotabuff()
 
@@ -139,40 +141,76 @@ class DotaBuff():
                 data[hero] += team_percentage
         return data
 
-    def get_heroes_images(self, size="lg", force=False):
+    def get_heroes_images(self, size="lg", force=False, ratio=1.0):
         """
         Get all the hero images and store them in data/images
         """
 
-        if not os.path.exists("data/images"):
-            os.makedirs("data/images")
-        os.chdir("data/images")
+        loc = "data/images_{}".format(size)
+
+        if not os.path.exists(loc):
+            os.makedirs(loc)
+        os.chdir(loc)
+
+        log.basicConfig(level=log.INFO)
+
+        log.warning("Downloading all hero images. This will take a few minutes.")
 
         for hero in api.get_heroes()["result"]["heroes"]:
             # if the hero is Abyssal Underlord, ignore because he's not in the game yet
             if hero["name"].find("abyssal_underlord") != -1:
                 continue
             if not os.path.exists("{}.png".format(hero["localized_name"])) or force:
-                with open("{}.png".format(hero["localized_name"]), "wb") as outfile:
-                    log.info("Getting hero image from {}".format(api.get_hero_image_url(hero["name"][len("npc_dota_hero_"):]) ) )
-                    outfile.write(urllib2.urlopen(api.get_hero_image_url(hero["name"][len("npc_dota_hero_"):], image_size=size)).read())
-                    outfile.close()
 
-    def get_heroes_images_resize(self, size="lg", ratio=1.0):
-        """
-        Get all the hero images and resize them
-        This is to reduce the load on the image matching
-        """
+                if ratio == 1.0:
+                    with open("{}.png".format(hero["localized_name"]), "wb") as outfile:
+                        log.info("Getting hero image from {}".format(api.get_hero_image_url(hero["name"][len("npc_dota_hero_"):])))
+                        outfile.write(urllib2.urlopen(api.get_hero_image_url(hero["name"][len("npc_dota_hero_"):], image_size=size)).read())
+                        outfile.close()
 
-        for hero in api.get_heroes()["result"]["heroes"]:
-            # if the hero is Abyssal Underlord, ignore because he's not in the game yet
-            if hero["name"].find("abyssal_underlord") != -1:
+                else:
+                    log.info("Getting hero image from {}".format(api.get_hero_image_url(hero["name"][len("npc_dota_hero_"):])))
+                    img = Image.open(cStringIO.StringIO(urllib2.urlopen(api.get_hero_image_url(hero["name"][len("npc_dota_hero_"):])).read()))
+                    img = img.resize((int(89 * ratio), int(50 * ratio)), Image.ANTIALIAS)
+                    img.save("{}.png".format(hero["localized_name"]))
+
+    def test(self):
+
+        import string
+        words = ["http://media.steampowered.com/apps/dota2/images/heroes/antimage_" + first + second + ".png" for second in string.ascii_lowercase for first in string.ascii_lowercase]
+
+        suc = []
+        fail = []
+
+        log.basicConfig(level=log.INFO)
+
+        pool = ThreadPool(8)
+        responses = pool.map(requests.get, words)
+
+
+        for response, word in zip(responses, words):
+            if response.status_code == 404:
+                fail.append(word)
+            else:
+                suc.append(word)
+
+        """
+        for word in words:
+            try:
+                req = urllib2.Request("http://media.steampowered.com/apps/dota2/images/heroes/antimage_{}.png".format(word))
+                print "http://media.steampowered.com/apps/dota2/images/heroes/antimage_{}.png".format(word)
+
+                hangle = urllib2.urlopen(req)
+
+            except urllib2.HTTPError, e:
+                fail.append(word)
+                print "fail"
                 continue
 
-            log.info("Getting hero image from {}".format(api.get_hero_image_url(hero["name"][len("npc_dota_hero_"):], "lg")))
+            suc.append(word)
+        """
+        print suc
+        print fail
 
-            # Download the image directly and open it as an image.
-            # Resize it based on the standard scale size and ratio and save it as normal
-            img = Image.open(cStringIO.StringIO(urllib2.urlopen(api.get_hero_image_url(hero["name"][len("npc_dota_hero_"):])).read()))
-            img = img.resize((int(89 * ratio), int(50 * ratio)), Image.ANTIALIAS)
-            img.save("data/images/{}.png".format(hero["localized_name"]))
+
+

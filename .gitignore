@@ -43,3 +43,5 @@ machups.json
 *.suo
 CounterPyck.pyproj
 CounterPyck.sln
+dump.log
+CounterPyck.sublime-workspace

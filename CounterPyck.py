@@ -30,6 +30,9 @@ class CounterPyck():
 
         self.dota_buff.get_hero_data()
 
+        self.screenshot_folder = []
+        self.dota2_location = "E:\\Steam\\SteamApps\\common\\dota 2 beta\\dota\\"
+
         heroes = []
         for image in os.listdir("data/images/"):
             heroes.append(os.path.join("data/images/", image))
@@ -44,6 +47,9 @@ class CounterPyck():
         start_time = time.time()
 
         while time.time() - start_time < 60:
+            if not self.check_for_screenshot():
+                continue
+
             last_time = time.time()
 
             result = True if DEBUG else self.grab_screenshot()
@@ -60,7 +66,19 @@ class CounterPyck():
 
             print "{} has a {} advantage".format(sorted_dota[0][0], sorted_dota[0][1])
 
+            with open("dump.log", "w") as o:
+                o.write(str(data))
+
             print "Time elapsed {}s".format(time.time() - last_time)
+
+    def check_for_screenshot(self):
+        files = os.listdir(os.path.join(self.dota2_location, "screenshot"))
+
+        return set(files).intersection(self.screenshot_folder)
+
+    def find_dota2_folder(self):
+        pass
+
 
     def grab_screenshot(self):
         """
