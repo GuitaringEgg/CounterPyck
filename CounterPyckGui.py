@@ -3,8 +3,16 @@ import wx
 
 
 class MainWindow(wx.Frame):
+    """
+    Extend the base wx.frame class to contain the properties
+    needed for the window
+    """
 
     def __init__(self, parent, title):
+        """
+        Set up the window with some properties and stuff
+        TODO: Create the GUI
+        """
         wx.Frame.__init__(self, parent, title=title, size=(200,100))
         self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE)
         self.CreateStatusBar() # A StatusBar in the bottom of the window
@@ -36,6 +44,9 @@ class MainWindow(wx.Frame):
     def OnExit(self,e):
         self.Close(True)  # Close the frame.
 
-app = wx.App(False)
-frame = MainWindow(None, "Sample editor")
-app.MainLoop()
+
+# If run as main, test the window
+if __name__ == "__main__":
+    app = wx.App(False)
+    frame = MainWindow(None, "Sample editor")
+    app.MainLoop()

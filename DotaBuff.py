@@ -24,6 +24,9 @@ class DotaBuff():
     matchups = {}
 
     def __init__(self):
+        """
+        Nothing to initialise
+        """
         pass
 
     def get_hero_data_dotabuff(self):
@@ -39,7 +42,7 @@ class DotaBuff():
         # grab all the heroes names and generate all the links we need
         heroes_html = BeautifulSoup(requests.get('http://dotabuff.com/heroes').text)
         for a in heroes_html.find('div', class_='hero-grid').find_all('a'):
-            matchup_links[a.text] = 'http://dotabuff.com%s/matchups' % a['href']
+            matchup_links[a.text] = 'http://dotabuff.com{}/matchups'.format(a['href'])
 
         # download all the html data for all the sites using 8 threads at a time
         log.info("Getting {} matchup pages from DotaBuff".format(len(matchup_links)))
